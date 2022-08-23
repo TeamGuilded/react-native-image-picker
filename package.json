@@ -60,5 +60,8 @@
     "android": {
       "javaPackageName": "com.imagepicker"
     }
+  },
+  "dependencies": {
+    "react-native-webp-format": "^1.1.2"
   }
 }

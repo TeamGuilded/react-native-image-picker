@@ -4,6 +4,7 @@
 #import <AVFoundation/AVFoundation.h>
 #import <Photos/Photos.h>
 #import <PhotosUI/PhotosUI.h>
+#import <SDWebImageWebPCoder/SDWebImageWebPCoder.h>
 
 @import MobileCoreServices;
 
@@ -131,7 +132,7 @@ RCT_EXPORT_METHOD(launchImageLibrary:(NSDictionary *)options callback:(RCTRespon
 NSData* extractImageData(UIImage* image){
     CFMutableDataRef imageData = CFDataCreateMutable(NULL, 0);
     CGImageDestinationRef destination = CGImageDestinationCreateWithData(imageData, kUTTypeJPEG, 1, NULL);
-    
+
     CFStringRef orientationKey[1];
     CFTypeRef   orientationValue[1];
     CGImagePropertyOrientation CGOrientation = CGImagePropertyOrientationForUIImageOrientation(image.imageOrientation);
@@ -141,11 +142,11 @@ NSData* extractImageData(UIImage* image){
 
     CFDictionaryRef imageProps = CFDictionaryCreate( NULL, (const void **)orientationKey, (const void **)orientationValue, 1,
                     &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks);
-    
+
     CGImageDestinationAddImage(destination, image.CGImage, imageProps);
-    
+
     CGImageDestinationFinalize(destination);
-    
+
     CFRelease(destination);
     CFRelease(orientationValue[0]);
     CFRelease(imageProps);
@@ -176,6 +177,8 @@ NSData* extractImageData(UIImage* image){
             data = UIImageJPEGRepresentation(newImage, quality);
         } else if ([fileType isEqualToString:@"png"]) {
             data = UIImagePNGRepresentation(newImage);
+        } else if ([fileType isEqualToString:@"webp"]) {
+            data = [[SDImageWebPCoder sharedCoder] encodedDataWithImage:image format:SDImageFormatWebP options:nil];
         }
     }
     
@@ -499,8 +502,10 @@ CGImagePropertyOrientation CGImagePropertyOrientationForUIImageOrientation(UIIma
         
         dispatch_group_enter(completionGroup);
 
-        if ([provider hasItemConformingToTypeIdentifier:(NSString *)kUTTypeImage]) {
-            NSString *identifier = provider.registeredTypeIdentifiers.firstObject;
+        NSString *identifier = provider.registeredTypeIdentifiers.firstObject;
+        BOOL isWebp = [identifier isEqualToString:@"org.webmproject.webp"];
+
+        if ([provider hasItemConformingToTypeIdentifier:(NSString *)kUTTypeImage] || isWebp) {
             // Matches both com.apple.live-photo-bundle and com.apple.private.live-photo-bundle
             if ([identifier containsString:@"live-photo-bundle"]) {
                 // Handle live photos
