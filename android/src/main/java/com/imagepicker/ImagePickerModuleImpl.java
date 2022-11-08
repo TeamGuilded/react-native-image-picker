@@ -156,7 +156,7 @@ public class ImagePickerModuleImpl implements ActivityEventListener {
         }
 
         try {
-            currentActivity.startActivityForResult(libraryIntent, requestCode);
+            currentActivity.startActivityForResult(Intent.createChooser(libraryIntent, "Select media"), requestCode);
         } catch (ActivityNotFoundException e) {
             callback.invoke(getErrorMap(errOthers, e.getMessage()));
             this.callback = null;
