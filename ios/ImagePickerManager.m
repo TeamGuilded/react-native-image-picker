@@ -139,6 +139,8 @@ RCT_EXPORT_METHOD(launchImageLibrary:(NSDictionary *)options callback:(RCTRespon
         newImage = [ImagePickerUtils resizeImage:image
                                      maxWidth:[self.options[@"maxWidth"] floatValue]
                                     maxHeight:[self.options[@"maxHeight"] floatValue]];
+
+        newImage = [ImagePickerUtils rotateImageIfRequired:newImage];
     }
 
     float quality = [self.options[@"quality"] floatValue];

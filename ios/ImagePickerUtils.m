@@ -4,6 +4,8 @@
 
 @implementation ImagePickerUtils
 
+static inline double degreesToRadians (double degrees) {return degrees * M_PI/180;}
+
 + (void) setupPickerFromOptions:(UIImagePickerController *)picker options:(NSDictionary *)options target:(RNImagePickerTarget)target
 {
     if ([[options objectForKey:@"mediaType"] isEqualToString:@"video"]) {
@@ -165,6 +167,27 @@
     UIImage *newImage = UIGraphicsGetImageFromCurrentImageContext();
     if (newImage == nil) {
         NSLog(@"could not scale image");
+    }
+    UIGraphicsEndImageContext();
+
+    return newImage;
+}
+
++ (UIImage*)rotateImageIfRequired:(UIImage*)image
+{
+    UIGraphicsBeginImageContext(image.size);
+    [image drawInRect:CGRectMake(0, 0, image.size.width, image.size.height)];
+    UIImage *newImage = UIGraphicsGetImageFromCurrentImageContext();
+
+    CGContextRef context = UIGraphicsGetCurrentContext();
+    if (image.imageOrientation == UIImageOrientationRight) {
+      CGContextRotateCTM (context, degreesToRadians(90));
+    } else if (image.imageOrientation == UIImageOrientationLeft) {
+      CGContextRotateCTM (context, degreesToRadians(-90));
+    } else if (image.imageOrientation == UIImageOrientationDown) {
+      CGContextRotateCTM (context, degreesToRadians(180));
+    } else if (image.imageOrientation == UIImageOrientationUp) {
+      CGContextRotateCTM (context, degreesToRadians(90));
     }
     UIGraphicsEndImageContext();
 

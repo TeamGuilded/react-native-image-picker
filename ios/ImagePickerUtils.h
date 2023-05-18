@@ -15,6 +15,8 @@
 
 + (UIImage*)resizeImage:(UIImage*)image maxWidth:(float)maxWidth maxHeight:(float)maxHeight;
 
++ (UIImage*)rotateImageIfRequired:(UIImage*)image;
+
 + (CGSize)getVideoDimensionsFromUrl:(NSURL *)url;
 
 + (NSString *) getFileTypeFromUrl:(NSURL *)url;
